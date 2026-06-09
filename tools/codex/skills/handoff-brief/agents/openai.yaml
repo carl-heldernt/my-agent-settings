@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff Brief"
+  short_description: "Summarize workspace state at start."
+  default_prompt: "Use $handoff-brief to review the workspace handoff and summarize current repo status."

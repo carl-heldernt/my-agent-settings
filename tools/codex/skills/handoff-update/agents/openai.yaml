@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff Update"
+  short_description: "Refresh workspace handoff records."
+  default_prompt: "Use $handoff-update to refresh the workspace handoff summary and session log."

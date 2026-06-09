@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff Close"
+  short_description: "Close the session with a handoff."
+  default_prompt: "Use $handoff-close to summarize the session, capture risks, and refresh the workspace handoff."
