@@ -1,0 +1,26 @@
+name: Validate Settings
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          test -f shared/AGENTS.md
+          test -f shared/VERSION
+          test -f shared/CHANGELOG.md
+          test -f shared/rules/language.md
+          test -f shared/rules/git-commit.md
+          test -f shared/rules/security.md
+          test -f shared/rules/workspace-context.md
+          test -f tools/codex/global/AGENTS.md
+          test -f tools/copilot/global/copilot-instructions.md
+
+      - name: Run build validation
+        run: python3 scripts/build.py --validate
