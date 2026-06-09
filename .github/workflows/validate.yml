@@ -15,12 +15,16 @@ jobs:
           test -f shared/AGENTS.md
           test -f shared/VERSION
           test -f shared/CHANGELOG.md
+          test -f shared/workflows/session-handoff.md
           test -f shared/rules/language.md
           test -f shared/rules/git-commit.md
           test -f shared/rules/security.md
           test -f shared/rules/workspace-context.md
           test -f tools/codex/global/AGENTS.md
           test -f tools/copilot/global/copilot-instructions.md
+          test -f tools/copilot/instructions/handoff.instructions.md
+          test -f templates/workspace/.ai-session/session-log/.gitkeep
+          test -f templates/repo/.ai-session/session-log/.gitkeep
 
       - name: Run build validation
         run: python3 scripts/build.py --validate

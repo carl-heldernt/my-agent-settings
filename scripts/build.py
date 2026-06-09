@@ -12,19 +12,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SHARED_DIR = ROOT / "shared"
 RULES_DIR = SHARED_DIR / "rules"
+WORKFLOWS_DIR = SHARED_DIR / "workflows"
 VERSION_FILE = SHARED_DIR / "VERSION"
-
-RULE_ORDER = [
-    ("language.md", "Language Rules"),
-    ("git-commit.md", "Git Commit Rules"),
-    ("security.md", "Security Rules"),
-    ("workspace-context.md", "Workspace Context Rules"),
-]
-
-OUTPUTS = {
-    ROOT / "tools" / "codex" / "global" / "AGENTS.md": "# AI Agent Instructions",
-    ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md": "# Copilot Instructions",
-}
+COPILOT_INSTRUCTIONS_DIR = ROOT / "tools" / "copilot" / "instructions"
 
 
 def read_text(path: Path) -> str:
@@ -37,12 +27,34 @@ def load_version() -> str:
     return read_text(VERSION_FILE)
 
 
-def load_rules() -> list[tuple[str, str]]:
-    rules: list[tuple[str, str]] = []
-    for filename, title in RULE_ORDER:
-        content = read_text(RULES_DIR / filename)
-        rules.append((title, content))
-    return rules
+def load_markdown_files(paths: list[Path]) -> list[tuple[str, str]]:
+    sections: list[tuple[str, str]] = []
+    for path in paths:
+        content = read_text(path)
+        sections.append((extract_heading(content, path), strip_leading_heading(content)))
+    return sections
+
+
+def load_shared_rules() -> list[tuple[str, str]]:
+    paths = sorted(RULES_DIR.glob("*.md"))
+    return load_markdown_files(paths)
+
+
+def load_shared_workflows() -> list[tuple[str, str]]:
+    paths = sorted(WORKFLOWS_DIR.glob("*.md"))
+    return load_markdown_files(paths)
+
+
+def load_copilot_instructions() -> list[tuple[str, str]]:
+    paths = sorted(COPILOT_INSTRUCTIONS_DIR.glob("*.instructions.md"))
+    return load_markdown_files(paths)
+
+
+def extract_heading(content: str, path: Path) -> str:
+    for line in content.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise ValueError(f"Missing top-level heading in {path}")
 
 
 def strip_leading_heading(content: str) -> str:
@@ -52,39 +64,64 @@ def strip_leading_heading(content: str) -> str:
     return "\n".join(lines).strip()
 
 
-def render_rule_section(title: str, content: str) -> str:
-    body = strip_leading_heading(content)
+def render_section(title: str, body: str) -> str:
     return "\n".join([f"## {title}", "", body, ""])
 
 
-def render_document(title: str, version: str, rules: list[tuple[str, str]]) -> str:
+def render_document(title: str, version: str, sections: list[tuple[str, str]]) -> str:
     header = f"<!-- Generated from my-agent-settings v{version} | {date.today().isoformat()} -->"
-    parts = [header, "", title, ""]
-    for section_title, content in rules:
-        parts.append(render_rule_section(section_title, content))
+    parts = [header, "", f"# {title}", ""]
+    for section_title, body in sections:
+        parts.append(render_section(section_title, body))
     return "\n".join(parts).rstrip() + "\n"
 
 
-def validate_rendered_document(path: Path, content: str) -> None:
+def validate_rendered_document(path: Path, content: str, section_titles: list[str]) -> None:
     if not content.strip():
         raise ValueError(f"Rendered output is empty: {path}")
     if not content.startswith("<!-- Generated from my-agent-settings v"):
         raise ValueError(f"Missing generated header: {path}")
-    for _, section_title in RULE_ORDER:
-        if f"## {section_title}" not in content:
+    search_from = 0
+    for section_title in section_titles:
+        marker = f"\n## {section_title}\n"
+        index = content.find(marker, search_from)
+        if index == -1:
             raise ValueError(f"Missing section {section_title} in {path}")
-    if content.count("\n## ") != len(RULE_ORDER):
-        raise ValueError(f"Unexpected section count in {path}")
+        search_from = index + len(marker)
 
 
 def build(validate_only: bool) -> int:
     version = load_version()
-    rules = load_rules()
-    rendered = {path: render_document(title, version, rules) for path, title in OUTPUTS.items()}
+    shared_rules = load_shared_rules()
+    shared_workflows = load_shared_workflows()
+    copilot_instructions = load_copilot_instructions()
+
+    codex_sections = shared_rules + shared_workflows
+    copilot_sections = shared_rules + shared_workflows + copilot_instructions
+    rendered = {
+        ROOT / "tools" / "codex" / "global" / "AGENTS.md": render_document(
+            "AI Agent Instructions",
+            version,
+            codex_sections,
+        ),
+        ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md": render_document(
+            "Copilot Instructions",
+            version,
+            copilot_sections,
+        ),
+    }
 
     if validate_only:
-        for path, content in rendered.items():
-            validate_rendered_document(path, content)
+        validate_rendered_document(
+            ROOT / "tools" / "codex" / "global" / "AGENTS.md",
+            rendered[ROOT / "tools" / "codex" / "global" / "AGENTS.md"],
+            [title for title, _ in codex_sections],
+        )
+        validate_rendered_document(
+            ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md",
+            rendered[ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md"],
+            [title for title, _ in copilot_sections],
+        )
         return 0
 
     for path, content in rendered.items():

@@ -14,6 +14,7 @@ python3 "$ROOT_DIR/scripts/build.py"
 
 mkdir -p "$WORKSPACE_ROOT/.ai-session"
 mkdir -p "$WORKSPACE_ROOT/.ai-session/tasks"
+mkdir -p "$WORKSPACE_ROOT/.ai-session/session-log"
 if [[ -f "$TEMPLATE_DIR/handoff.md" && ! -e "$WORKSPACE_ROOT/.ai-session/handoff.md" ]]; then
   cp "$TEMPLATE_DIR/handoff.md" "$WORKSPACE_ROOT/.ai-session/handoff.md"
 fi
