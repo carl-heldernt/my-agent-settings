@@ -45,12 +45,36 @@ def load_rules() -> list[tuple[str, str]]:
     return rules
 
 
+def strip_leading_heading(content: str) -> str:
+    lines = content.splitlines()
+    if lines and lines[0].startswith("# "):
+        lines = lines[1:]
+    return "\n".join(lines).strip()
+
+
+def render_rule_section(title: str, content: str) -> str:
+    body = strip_leading_heading(content)
+    return "\n".join([f"## {title}", "", body, ""])
+
+
 def render_document(title: str, version: str, rules: list[tuple[str, str]]) -> str:
     header = f"<!-- Generated from my-agent-settings v{version} | {date.today().isoformat()} -->"
     parts = [header, "", title, ""]
     for section_title, content in rules:
-        parts.extend([f"## {section_title}", "", content, ""])
+        parts.append(render_rule_section(section_title, content))
     return "\n".join(parts).rstrip() + "\n"
+
+
+def validate_rendered_document(path: Path, content: str) -> None:
+    if not content.strip():
+        raise ValueError(f"Rendered output is empty: {path}")
+    if not content.startswith("<!-- Generated from my-agent-settings v"):
+        raise ValueError(f"Missing generated header: {path}")
+    for _, section_title in RULE_ORDER:
+        if f"## {section_title}" not in content:
+            raise ValueError(f"Missing section {section_title} in {path}")
+    if content.count("\n## ") != len(RULE_ORDER):
+        raise ValueError(f"Unexpected section count in {path}")
 
 
 def build(validate_only: bool) -> int:
@@ -60,8 +84,7 @@ def build(validate_only: bool) -> int:
 
     if validate_only:
         for path, content in rendered.items():
-            if not content.strip():
-                raise ValueError(f"Rendered output is empty: {path}")
+            validate_rendered_document(path, content)
         return 0
 
     for path, content in rendered.items():

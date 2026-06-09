@@ -4,15 +4,11 @@
 
 ## Language Rules
 
-# Language Rules
-
 - Communicate with the user in Traditional Chinese.
 - Keep code identifiers, inline comments, block comments, and docstrings in English.
 - Keep technical documentation and specifications in English.
 
 ## Git Commit Rules
-
-# Git Commit Rules
 
 - Use the 50/72 rule for commit messages.
 - Format subjects as `<type>[!](<scope>): <short-description>`.
@@ -26,8 +22,6 @@
 
 ## Security Rules
 
-# Security Rules
-
 - Do not store secrets in git-tracked files.
 - Do not store secrets in `.ai-session/`.
 - Prefer environment variables first.
@@ -37,8 +31,6 @@
 - Include `.env`, `.env.*`, `*.pem`, and `*.key` in template ignores.
 
 ## Workspace Context Rules
-
-# Workspace Context Rules
 
 - Treat workspace roots as multi-repository environments when applicable.
 - Use explicit relative paths when referring to changed files.
