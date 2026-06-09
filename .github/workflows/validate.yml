@@ -23,6 +23,7 @@ jobs:
           test -f tools/codex/global/AGENTS.md
           test -f tools/copilot/global/copilot-instructions.md
           test -f tools/copilot/instructions/handoff.instructions.md
+          test -f scripts/migrate-codex-to-ai-session.sh
           test -f templates/workspace/.ai-session/session-log/.gitkeep
           test -f templates/repo/.ai-session/session-log/.gitkeep
 

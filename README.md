@@ -15,3 +15,4 @@ Reusable configuration and templates for agent-driven coding workflows.
 - `python3 scripts/build.py --validate` to validate inputs only
 - `bash scripts/deploy-global.sh` to install global Codex config
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
+- `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
