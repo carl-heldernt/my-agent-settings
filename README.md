@@ -35,3 +35,13 @@ Reusable configuration and templates for agent-driven coding workflows.
 - `bash scripts/deploy-global.sh` to install global Codex config and skills
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
+
+## Task file status model
+
+- Keep `.ai-session/tasks/` as a flat directory.
+- Name task files as `<status>--<slug>.md`.
+- Allowed statuses are `draft`, `in-progress`, and `done`.
+- Use YAML frontmatter in every task file.
+- Treat `frontmatter.status` as the source of truth.
+- Keep the filename prefix synchronized with `frontmatter.status`.
+- Treat `<slug>` as the stable task identity across status changes.

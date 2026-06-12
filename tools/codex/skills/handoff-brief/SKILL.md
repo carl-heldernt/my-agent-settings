@@ -20,15 +20,18 @@ Use the `.ai-session/` directory at that level for all handoff state.
 3. Read relevant files in `.ai-session/tasks/`
    when the active TODO items in
    the handoff point to task-level detail.
-4. Read today's session log if it exists and appears relevant.
-5. Inspect the workspace root repo and each child repo with a `.git` directory.
-6. Produce a concise summary of:
+4. When task files use status prefixes, treat
+   `frontmatter.status` as authoritative and use the filename prefix only as a
+   quick visual index.
+5. Read today's session log if it exists and appears relevant.
+6. Inspect the workspace root repo and each child repo with a `.git` directory.
+7. Produce a concise summary of:
    - current goal
    - active repos and dirty repos
    - recent meaningful changes
    - active TODO items and linked task files when relevant
    - blockers or contradictions between the handoff and actual repo state
-7. Recommend the most sensible next steps.
+8. Recommend the most sensible next steps.
 
 ## Repo Inspection Rules
 
@@ -48,11 +51,16 @@ Present:
 4. A list of important blockers or uncertainties
 5. A prioritized next-step recommendation
 
+When listing task files, prefer grouping them by `draft`, `in-progress`, and
+`done` when that helps the next session scan quickly.
+
 ## Reconciliation Rules
 
 - Trust live repo state over stale handoff notes.
 - If `.ai-session/handoff.md` appears outdated, say so explicitly.
 - Highlight mismatches between documented status and actual git status.
+- Highlight mismatches between task filename prefixes and
+  `frontmatter.status` when they matter.
 - Preserve factual uncertainty instead of guessing.
 
 ## Writing Rules

@@ -26,9 +26,14 @@ Use the `.ai-session/` directory at that level for all handoff state.
 4. Create or update `.ai-session/tasks/*.md`
    when active TODO items need
    durable task-level detail beyond the summary handoff.
-5. Update `.ai-session/handoff.md` to reflect
+5. For every task file you create or update:
+   - use the filename format `<status>--<slug>.md`
+   - allow only `draft`, `in-progress`, or `done`
+   - store the authoritative state in YAML frontmatter as `status`
+   - keep the filename prefix synchronized with `frontmatter.status`
+6. Update `.ai-session/handoff.md` to reflect
    the latest durable summary state.
-6. Create or append `.ai-session/session-log/YYYY-MM-DD.md` with a short timestamped entry.
+7. Create or append `.ai-session/session-log/YYYY-MM-DD.md` with a short timestamped entry.
 
 ## Repo Inspection Rules
 
@@ -81,6 +86,30 @@ Update `.ai-session/tasks/*.md` when a TODO item needs:
 - a checklist or subtask breakdown
 - validation details
 - blockers or resume notes across sessions
+
+Task files should follow this minimum shape:
+
+```markdown
+---
+status: in-progress
+updated_at: YYYY-MM-DD
+---
+
+# Task Title
+
+## Summary
+
+## Current State
+
+## Open Questions / Blockers
+
+## Next Actions
+
+## Validation Notes
+```
+
+Treat `frontmatter.status` as the source of truth. If a task filename prefix
+and `frontmatter.status` disagree, fix the filename on the next write.
 
 Append an entry like this to `.ai-session/session-log/YYYY-MM-DD.md`:
 

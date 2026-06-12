@@ -19,19 +19,21 @@ Use the `.ai-session/` directory at that level for all handoff state.
    and the current workspace state.
 2. Review relevant files in `.ai-session/tasks/*.md` for unfinished or active TODO items when they
    exist.
-3. Inspect each relevant repo for:
+3. Treat `frontmatter.status` as authoritative for task files and keep status
+   prefixes aligned when you update them.
+4. Inspect each relevant repo for:
    - branch and cleanliness
    - modified or untracked files
    - recent commits in the active workstream
-4. Summarize:
+5. Summarize:
    - completed work
    - unfinished work
    - blockers, risks, and unresolved decisions
    - recommended next actions
-5. Refresh `.ai-session/tasks/*.md` for any
+6. Refresh `.ai-session/tasks/*.md` for any
    unfinished detailed TODO items.
-6. Refresh `.ai-session/handoff.md`.
-7. Append a concise closeout entry to `.ai-session/session-log/YYYY-MM-DD.md`.
+7. Refresh `.ai-session/handoff.md`.
+8. Append a concise closeout entry to `.ai-session/session-log/YYYY-MM-DD.md`.
 
 ## Required Content
 
@@ -51,6 +53,7 @@ Ensure the handoff covers:
 - Record blockers and risks that could cause the next session to stall.
 - Mention any validation that was completed and any validation still missing.
 - Highlight dirty repos that must not be forgotten.
+- Use only `draft`, `in-progress`, and `done` as task states.
 - Keep `.ai-session/handoff.md` concise and move
   detailed unfinished task context into `.ai-session/tasks/`
   when needed.

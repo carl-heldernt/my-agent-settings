@@ -365,10 +365,22 @@ Instead of tool-specific state stores, all agents are instructed to communicate 
 └── tasks/
 ```
 
+Task files use a flat structure with a hybrid status model:
+
+```text
+.ai-session/
+├── handoff.md
+└── tasks/
+    ├── draft--example-task.md
+    ├── in-progress--agent-rollout.md
+    └── done--workspace-bootstrap.md
+```
+
 ### Shared State Protocol:
 1. **Initialization:** Every agent session begins by reading `.ai-session/handoff.md` to instantly absorb the current technical context, high-level business goals, completed changes, and pending tasks.
 2. **Explicit Routing:** In `shared/rules/workspace-context.md`, agents are instructed to acknowledge they are operating at a multi-repo root level and to track modified files using explicit relative paths (e.g., `./repo-a/src/main.py`).
 3. **Session Closure:** Upon completing a task or intercepting a session close command, the active agent updates the current state in `.ai-session/handoff.md` for the next agent to consume.
+4. **Task Status Tracking:** Task detail files in `.ai-session/tasks/` use YAML frontmatter for structured status and a matching filename prefix for quick directory scanning. The allowed states are `draft`, `in-progress`, and `done`, with `frontmatter.status` treated as the source of truth.
 
 **Do not store:** Raw conversation logs, credentials, tokens, or environment secrets.
 

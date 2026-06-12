@@ -51,13 +51,19 @@ Use this workflow when a session needs to be resumed by another agent.
 1. Read the active agent instructions.
 2. Read the workspace root `.ai-session/handoff.md`.
 3. Read relevant files in `.ai-session/tasks/` when task-level detail exists.
-4. Inspect the workspace repositories and note the actual git state.
+4. When task files exist, treat `frontmatter.status` as the source of truth
+   and use the filename prefix only as a quick visual index.
+5. Inspect the workspace repositories and note the actual git state.
 
 ## During Work
 
 1. Keep the durable handoff in sync with meaningful progress.
 2. Store task-level detail in `.ai-session/tasks/` when the main handoff is too coarse.
-3. Prefer explicit file paths and repository names.
+3. Name task files as `<status>--<slug>.md` using only `draft`,
+   `in-progress`, or `done`.
+4. Keep each task file's `frontmatter.status` synchronized with its filename
+   prefix.
+5. Prefer explicit file paths and repository names.
 
 ## End of Session
 
@@ -74,13 +80,17 @@ When working in a workspace that uses `.ai-session/`, follow this handoff flow:
 
 1. Read `.ai-session/handoff.md` first.
 2. Read `.ai-session/tasks/` when the handoff references task files.
-3. Inspect the repositories in the workspace and trust live git state over stale notes.
+3. Treat task file `frontmatter.status` as authoritative when task files use
+   status prefixes in their filenames.
+4. Inspect the repositories in the workspace and trust live git state over stale notes.
 
 ## During Work
 
 1. Keep the handoff aligned with meaningful progress.
 2. Track cross-repo context using explicit relative paths.
 3. Use `.ai-session/tasks/` for detailed task context when needed.
+4. Name task files as `<status>--<slug>.md` and keep the filename prefix
+   aligned with `frontmatter.status`.
 
 ## End of Session
 
