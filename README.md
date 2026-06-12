@@ -36,6 +36,15 @@ Reusable configuration and templates for agent-driven coding workflows.
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
 
+## When to run scripts
+
+- Run `python3 scripts/build.py` whenever you change shared rules, shared workflows, or Copilot instruction sources that feed generated outputs under `tools/*/global/`.
+- Run `python3 scripts/build.py --validate` when you want a quick consistency check without rewriting generated files.
+- Do not run deployment or migration scripts for documentation-only changes unless you are intentionally applying the updated templates or configuration to a real workspace.
+- Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates or Copilot workspace files.
+- Run `bash scripts/deploy-global.sh` only when you need to refresh the installed global Codex configuration and skills.
+- Run `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` only when moving an existing workspace from legacy `.codex` handoff state.
+
 ## Task file status model
 
 - Keep `.ai-session/tasks/` as a flat directory.
