@@ -15,7 +15,8 @@ Reusable configuration and templates for agent-driven coding workflows.
    - `bash scripts/deploy-global.sh`
    - `bash scripts/deploy-workspace.sh <workspace-root>`
 2. Start Codex in the workspace root.
-3. Use the Codex handoff skills when you need to brief, update, or close a session.
+3. Use the global Codex handoff skills from `~/.codex/skills/` when you need
+   to brief, update, or close a session.
 4. If you are moving from legacy `.codex` handoff files, run:
    - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>`
 
@@ -31,6 +32,6 @@ Reusable configuration and templates for agent-driven coding workflows.
 
 - `python3 scripts/build.py` to generate compiled tool outputs
 - `python3 scripts/build.py --validate` to validate inputs only
-- `bash scripts/deploy-global.sh` to install global Codex config
+- `bash scripts/deploy-global.sh` to install global Codex config and skills
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`

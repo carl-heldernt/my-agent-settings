@@ -27,5 +27,4 @@ if [[ -d "$TEMPLATE_DIR/tasks" ]]; then
     fi
   done
 fi
-ln -sf "$ROOT_DIR/tools/codex/skills" "$WORKSPACE_ROOT/.agents"
 ln -sf "$ROOT_DIR/tools/copilot" "$WORKSPACE_ROOT/.github"

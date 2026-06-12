@@ -154,16 +154,17 @@ OpenAI Codex specific configuration.
 
 Used for:
 - Codex user instructions
-- Codex skills
+- Codex global skills
 - Codex workspace initialization
 
 Typical installation targets (via Symlinks):
 ```text
 ~/.codex/
 └── AGENTS.md                      # Symlinked from tools/codex/global/AGENTS.md
-
-/workspace-root/ (e.g., GitLab/)
-└── .agents/ -> tools/codex/skills # Symlinked folder for active skills
+└── skills/
+    ├── handoff-brief/            # Symlinked from tools/codex/skills/
+    ├── handoff-update/
+    └── handoff-close/
 ```
 
 
@@ -198,8 +199,6 @@ GitLab/ (Workspace Root)
 ├── repo-a/                        # Sub-repository A
 ├── repo-b/                        # Sub-repository B
 ├── repo-c/                        # Sub-repository C
-├── AGENTS.md                      # Symlink to Codex global rules
-├── .agents/                       # Symlink to Codex skills
 ├── .github/                       # Symlink to Copilot configurations
 └── .ai-session/                   # Local physical directory (Not Symlinked)
     ├── handoff.md                 # Universal cross-agent session state bridge
@@ -209,6 +208,13 @@ GitLab/ (Workspace Root)
 Key Benefits:
 - Allows agents to maintain a macro-perspective of the entire platform or cross-repo dependencies.
 - Keeps temporary session text local to the workspace root without polluting individual repository Git histories.
+- Keeps cross-workspace Codex handoff skills in one global location instead
+  of duplicating them under each workspace root.
+
+Workspace root constraint:
+- Workspace roots are coordination directories, not Git repositories.
+- Do not create, restore, or retain a `.git/` directory at roots such as
+  `~/workspace/`, `~/workspace/GitHub/`, or `~/workspace/GitLab/`.
 
 
 ## templates/repo/
@@ -247,12 +253,15 @@ $ python scripts/build.py --validate
 ```
 
 ### `deploy-global.sh` (Global Setup Manager)
-Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`) and establishes symbolic links targeting compiled global rules.
+Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`) and establishes symbolic links targeting compiled global rules and shared Codex skills.
 
 ### `deploy-workspace.sh` (Workspace Deployment Manager)
 Initializes a target workspace root directory (e.g., `~/workspace/GitLab/`).
-- **Uses Symbolic Links (`ln -sf`)** for `tools/` configurations so that updates in this settings repository propagate instantly across all development environments without manual re-installation.
+- **Uses Symbolic Links (`ln -sf`)** for workspace-level configurations so that updates in this settings repository propagate instantly across all development environments without manual re-installation.
 - **Initializes local `.ai-session/` templates** if they do not already exist to track local session variables safely.
+- **Does not install Codex skills into the workspace root.** Shared Codex
+  handoff skills are installed globally under `~/.codex/skills/` by
+  `deploy-global.sh`.
 
 ---
 
