@@ -23,6 +23,14 @@ jobs:
           test -f tools/codex/global/AGENTS.md
           test -f tools/copilot/global/copilot-instructions.md
           test -f tools/copilot/instructions/handoff.instructions.md
+          test -f tools/claude/global/CLAUDE.md
+          test -f tools/claude/workspace/CLAUDE.md
+          test -f tools/codex/skills/handoff-brief/SKILL.md
+          test -f tools/codex/skills/handoff-update/SKILL.md
+          test -f tools/codex/skills/handoff-close/SKILL.md
+          test -f tools/claude/skills/handoff-brief/SKILL.md
+          test -f tools/claude/skills/handoff-update/SKILL.md
+          test -f tools/claude/skills/handoff-close/SKILL.md
           test -f scripts/migrate-codex-to-ai-session.sh
           test -f templates/workspace/.ai-session/session-log/.gitkeep
           test -f templates/repo/.ai-session/session-log/.gitkeep

@@ -15,6 +15,7 @@ RULES_DIR = SHARED_DIR / "rules"
 WORKFLOWS_DIR = SHARED_DIR / "workflows"
 VERSION_FILE = SHARED_DIR / "VERSION"
 COPILOT_INSTRUCTIONS_DIR = ROOT / "tools" / "copilot" / "instructions"
+CLAUDE_INSTRUCTIONS_DIR = ROOT / "tools" / "claude" / "instructions"
 
 
 def read_text(path: Path) -> str:
@@ -35,8 +36,21 @@ def load_markdown_files(paths: list[Path]) -> list[tuple[str, str]]:
     return sections
 
 
+# Rules that apply to every project on the machine (loaded via ~/.claude/CLAUDE.md).
+CLAUDE_GLOBAL_RULES = ["git-commit.md", "language.md", "security.md"]
+
+# Rules that apply only at a workspace root (loaded via <workspace>/CLAUDE.md).
+# session-handoff is intentionally excluded: it is covered by the handoff skills.
+CLAUDE_WORKSPACE_RULES = ["workspace-context.md"]
+
+
 def load_shared_rules() -> list[tuple[str, str]]:
     paths = sorted(RULES_DIR.glob("*.md"))
+    return load_markdown_files(paths)
+
+
+def load_rules_by_names(names: list[str]) -> list[tuple[str, str]]:
+    paths = [RULES_DIR / name for name in names]
     return load_markdown_files(paths)
 
 
@@ -47,6 +61,11 @@ def load_shared_workflows() -> list[tuple[str, str]]:
 
 def load_copilot_instructions() -> list[tuple[str, str]]:
     paths = sorted(COPILOT_INSTRUCTIONS_DIR.glob("*.instructions.md"))
+    return load_markdown_files(paths)
+
+
+def load_claude_instructions() -> list[tuple[str, str]]:
+    paths = sorted(CLAUDE_INSTRUCTIONS_DIR.glob("*.instructions.md"))
     return load_markdown_files(paths)
 
 
@@ -95,9 +114,18 @@ def build(validate_only: bool) -> int:
     shared_rules = load_shared_rules()
     shared_workflows = load_shared_workflows()
     copilot_instructions = load_copilot_instructions()
+    claude_instructions = load_claude_instructions()
+    claude_global_rules = load_rules_by_names(CLAUDE_GLOBAL_RULES)
+    claude_workspace_rules = load_rules_by_names(CLAUDE_WORKSPACE_RULES)
 
+    # Codex and Copilot include all shared rules + workflows (no skills equivalent).
     codex_sections = shared_rules + shared_workflows
     copilot_sections = shared_rules + shared_workflows + copilot_instructions
+    # Claude global: personal rules only; session-handoff covered by skills.
+    claude_global_sections = claude_global_rules + claude_instructions
+    # Claude workspace: workspace-scoped rules only; loaded when CWD is a workspace root.
+    claude_workspace_sections = claude_workspace_rules
+
     rendered = {
         ROOT / "tools" / "codex" / "global" / "AGENTS.md": render_document(
             "AI Agent Instructions",
@@ -108,6 +136,16 @@ def build(validate_only: bool) -> int:
             "Copilot Instructions",
             version,
             copilot_sections,
+        ),
+        ROOT / "tools" / "claude" / "global" / "CLAUDE.md": render_document(
+            "Claude Code Instructions",
+            version,
+            claude_global_sections,
+        ),
+        ROOT / "tools" / "claude" / "workspace" / "CLAUDE.md": render_document(
+            "Claude Code Workspace Instructions",
+            version,
+            claude_workspace_sections,
         ),
     }
 
@@ -121,6 +159,16 @@ def build(validate_only: bool) -> int:
             ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md",
             rendered[ROOT / "tools" / "copilot" / "global" / "copilot-instructions.md"],
             [title for title, _ in copilot_sections],
+        )
+        validate_rendered_document(
+            ROOT / "tools" / "claude" / "global" / "CLAUDE.md",
+            rendered[ROOT / "tools" / "claude" / "global" / "CLAUDE.md"],
+            [title for title, _ in claude_global_sections],
+        )
+        validate_rendered_document(
+            ROOT / "tools" / "claude" / "workspace" / "CLAUDE.md",
+            rendered[ROOT / "tools" / "claude" / "workspace" / "CLAUDE.md"],
+            [title for title, _ in claude_workspace_sections],
         )
         return 0
 

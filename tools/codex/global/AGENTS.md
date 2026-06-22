@@ -1,4 +1,4 @@
-<!-- Generated from my-agent-settings v0.1.0 | 2026-06-12 -->
+<!-- Generated from my-agent-settings v0.2.0 | 2026-06-22 -->
 
 # AI Agent Instructions
 

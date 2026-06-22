@@ -16,9 +16,10 @@ Current supported tools:
 
 - OpenAI Codex CLI
 - GitHub Copilot CLI
+- Claude Code
 
 The repository is designed to allow future expansion for additional tools such
-as Claude Code, Gemini CLI, Cursor, or other coding agents.
+as Gemini CLI, Cursor, or other coding agents.
 
 
 ---
@@ -47,13 +48,24 @@ my-agent-settings/
 │   │   └── templates/
 │   │       └── workspace/
 │   │
-│   └── copilot/
+│   ├── copilot/
+│   │   ├── global/
+│   │   │   └── copilot-instructions.md # Compiled from shared/
+│   │   ├── instructions/
+│   │   │   └── *.instructions.md
+│   │   └── templates/
+│   │       └── workspace/
+│   │
+│   └── claude/
 │       ├── global/
-│       │   └── copilot-instructions.md # Compiled from shared/
-│       ├── instructions/
-│       │   └── *.instructions.md
-│       └── templates/
-│           └── workspace/
+│       │   └── CLAUDE.md               # Compiled from shared/
+│       ├── workspace/
+│       │   └── CLAUDE.md               # Compiled from shared/ (workspace-scoped)
+│       ├── skills/
+│       │   └── <skill-name>/
+│       │       └── SKILL.md
+│       └── instructions/
+│           └── *.instructions.md
 │
 ├── templates/
 │   ├── workspace/                 # For root directories like GitLab/ or GitHub/
@@ -128,14 +140,15 @@ Compiled outputs (e.g., `AGENTS.md`) automatically include a header comment:
 ```
 
 ```text
-                  [ shared/rules/ ]
-                          |
-                   scripts/build.py
-                          |
-        +-----------------+-----------------+
-        |                                   |
-        v                                   v
-tools/codex/global/AGENTS.md      tools/copilot/global/copilot-instructions.md
+                       [ shared/rules/ ]
+                               |
+                        scripts/build.py
+                               |
+        +----------------------+----------------------+
+        |                      |                      |
+        v                      v                      v
+tools/codex/global/  tools/copilot/global/  tools/claude/global/
+AGENTS.md            copilot-instructions.md  CLAUDE.md
 ```
 
 
@@ -166,6 +179,32 @@ Typical installation targets (via Symlinks):
     ├── handoff-update/
     └── handoff-close/
 ```
+
+
+## tools/claude/
+
+Claude Code specific configuration.
+
+Used for:
+- Claude Code global and workspace-level instructions
+- Claude Code global handoff skills
+
+Typical installation targets (via symlinks):
+```text
+~/.claude/
+├── CLAUDE.md                      # Symlinked from tools/claude/global/CLAUDE.md
+└── skills/
+    ├── handoff-brief/            # Symlinked from tools/claude/skills/
+    ├── handoff-update/
+    └── handoff-close/
+
+<workspace-root>/
+└── CLAUDE.md                      # Symlinked from tools/claude/workspace/CLAUDE.md
+```
+
+Like Codex, Claude Code handoff skills are installed once into the global
+`~/.claude/skills/` location by `deploy-global.sh`, so they are available from
+every workspace root without per-workspace installation.
 
 
 ## tools/copilot/
@@ -253,15 +292,15 @@ $ python scripts/build.py --validate
 ```
 
 ### `deploy-global.sh` (Global Setup Manager)
-Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`) and establishes symbolic links targeting compiled global rules and shared Codex skills.
+Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`, `~/.claude/`) and establishes symbolic links targeting compiled global rules and the shared handoff skills for both Codex (`~/.codex/skills/`) and Claude Code (`~/.claude/skills/`).
 
 ### `deploy-workspace.sh` (Workspace Deployment Manager)
 Initializes a target workspace root directory (e.g., `~/workspace/GitLab/`).
 - **Uses Symbolic Links (`ln -sf`)** for workspace-level configurations so that updates in this settings repository propagate instantly across all development environments without manual re-installation.
 - **Initializes local `.ai-session/` templates** if they do not already exist to track local session variables safely.
-- **Does not install Codex skills into the workspace root.** Shared Codex
-  handoff skills are installed globally under `~/.codex/skills/` by
-  `deploy-global.sh`.
+- **Does not install handoff skills into the workspace root.** Shared Codex and
+  Claude Code handoff skills are installed globally under `~/.codex/skills/` and
+  `~/.claude/skills/` by `deploy-global.sh`.
 
 ---
 

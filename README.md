@@ -9,6 +9,20 @@ Reusable configuration and templates for agent-driven coding workflows.
 - `tools/`: tool-specific compiled outputs and skills
 - `templates/`: workspace and repository starter layouts
 
+## Using Claude Code
+
+1. Deploy the global settings:
+   - `bash scripts/deploy-global.sh`
+2. Start Claude Code in any directory. Global instructions are loaded from
+   `~/.claude/CLAUDE.md` automatically.
+3. To also apply instructions at a workspace root level, run:
+   - `bash scripts/deploy-workspace.sh <workspace-root>`
+   This creates a `CLAUDE.md` symlink at the workspace root.
+4. Use the global Claude Code handoff skills from `~/.claude/skills/`
+   (`handoff-brief`, `handoff-update`, `handoff-close`) when you need to brief,
+   update, or close a session. They are installed by `deploy-global.sh` and work
+   from any workspace root.
+
 ## Using Codex CLI
 
 1. Deploy the workspace and global settings if needed:
@@ -32,7 +46,7 @@ Reusable configuration and templates for agent-driven coding workflows.
 
 - `python3 scripts/build.py` to generate compiled tool outputs
 - `python3 scripts/build.py --validate` to validate inputs only
-- `bash scripts/deploy-global.sh` to install global Codex config and skills
+- `bash scripts/deploy-global.sh` to install global Codex and Claude Code config
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
 
@@ -41,8 +55,8 @@ Reusable configuration and templates for agent-driven coding workflows.
 - Run `python3 scripts/build.py` whenever you change shared rules, shared workflows, or Copilot instruction sources that feed generated outputs under `tools/*/global/`.
 - Run `python3 scripts/build.py --validate` when you want a quick consistency check without rewriting generated files.
 - Do not run deployment or migration scripts for documentation-only changes unless you are intentionally applying the updated templates or configuration to a real workspace.
-- Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates or Copilot workspace files.
-- Run `bash scripts/deploy-global.sh` only when you need to refresh the installed global Codex configuration and skills.
+- Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates, Copilot workspace files, or the workspace-level `CLAUDE.md` symlink.
+- Run `bash scripts/deploy-global.sh` only when you need to refresh the installed global Codex and Claude Code configuration.
 - Run `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` only when moving an existing workspace from legacy `.codex` handoff state.
 
 ## Task file status model

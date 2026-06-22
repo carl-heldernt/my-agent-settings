@@ -10,6 +10,21 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE_ROOT="$1"
 TEMPLATE_DIR="$ROOT_DIR/templates/workspace/.ai-session"
 
+# Link $2 -> $1, but skip if $2 already exists and does NOT point into this repo.
+safe_link() {
+  local src="$1" dst="$2"
+  if [[ -e "$dst" || -L "$dst" ]]; then
+    local current
+    current="$(readlink "$dst" 2>/dev/null || true)"
+    if [[ "$current" == "$src" ]]; then
+      return 0  # already correct, nothing to do
+    fi
+    echo "SKIP $dst (already exists and points elsewhere: ${current:-<real file>})" >&2
+    return 0
+  fi
+  ln -sf "$src" "$dst"
+}
+
 python3 "$ROOT_DIR/scripts/build.py"
 
 mkdir -p "$WORKSPACE_ROOT/.ai-session"
@@ -27,4 +42,5 @@ if [[ -d "$TEMPLATE_DIR/tasks" ]]; then
     fi
   done
 fi
-ln -sf "$ROOT_DIR/tools/copilot" "$WORKSPACE_ROOT/.github"
+safe_link "$ROOT_DIR/tools/copilot" "$WORKSPACE_ROOT/.github"
+safe_link "$ROOT_DIR/tools/claude/workspace/CLAUDE.md" "$WORKSPACE_ROOT/CLAUDE.md"
