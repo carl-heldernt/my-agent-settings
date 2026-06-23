@@ -1,6 +1,7 @@
 ---
 name: handoff-brief
 description: Review the current state of a multi-repo development workspace at the beginning of a new session. Use when you need to read `CLAUDE.md`, read `.ai-session/handoff.md`, inspect git status across all repos in the workspace, summarize current project state, and suggest the next recommended steps before resuming work.
+model: claude-sonnet-4-6
 ---
 
 # Handoff Brief

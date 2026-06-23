@@ -1,6 +1,7 @@
 ---
 name: handoff-close
 description: Close out a work session in a multi-repo development workspace. Use when you need to summarize completed work, summarize unfinished work, record blockers or risks, propose next actions, and refresh `.ai-session/handoff.md` before ending major work or handing off to a future session.
+model: claude-haiku-4-5-20251001
 ---
 
 # Handoff Close

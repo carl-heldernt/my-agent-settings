@@ -1,6 +1,7 @@
 ---
 name: handoff-update
 description: Update workspace handoff records for a multi-repo development workspace. Use when you need to refresh `.ai-session/handoff.md` and `.ai-session/session-log/YYYY-MM-DD.md` based on current workspace context, recent development activity, git status, modified files, recent commits, and current task progress during long-running or multi-day work.
+model: claude-haiku-4-5-20251001
 ---
 
 # Handoff Update
