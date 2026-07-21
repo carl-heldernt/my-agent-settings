@@ -1,4 +1,4 @@
-<!-- Generated from my-agent-settings v0.2.0 | 2026-06-22 -->
+<!-- Generated from my-agent-settings v0.2.0 | 2026-07-21 -->
 
 # Copilot Instructions
 
@@ -71,6 +71,14 @@ Use this workflow when a session needs to be resumed by another agent.
 2. Refresh `.ai-session/session-log/YYYY-MM-DD.md`.
 3. Capture blockers, unfinished work, and the next recommended step.
 4. Avoid storing secrets, raw chat logs, or transient debugging noise.
+
+## Keeping the Handoff Lean
+
+`.ai-session/handoff.md` is a summary layer, not an archive. Detail belongs
+in `.ai-session/tasks/`; resolved entries should shrink to a one-line
+pointer once their detail lives in a task file. When `handoff.md` grows
+past the point where skimming still works, run the `handoff-compact`
+workflow instead of letting resolved entries accumulate in place.
 
 ## Handoff Instructions
 

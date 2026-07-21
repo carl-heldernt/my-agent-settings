@@ -35,6 +35,8 @@ Use the `.ai-session/` directory at that level for all handoff state.
 6. Update `.ai-session/handoff.md` to reflect
    the latest durable summary state.
 7. Create or append `.ai-session/session-log/YYYY-MM-DD.md` with a short timestamped entry.
+8. Check `.ai-session/handoff.md` size (see Compaction Check below) and
+   report the suggestion to the user if it triggers.
 
 ## Repo Inspection Rules
 
@@ -62,6 +64,18 @@ Use this section order in `.ai-session/handoff.md`:
 - Append new entries instead of rewriting the full day unless the file is still a trivial stub.
 - Prefix each entry with a timestamp.
 - Keep entries shorter than the main handoff unless a risk needs more detail.
+
+## Compaction Check
+
+This skill does not compact `.ai-session/handoff.md` itself — that judgment
+call belongs to the `handoff-compact` skill, run separately.
+
+After updating the handoff, check whether it has grown past the point
+where skimming still works: more than ~150 lines total, or any single
+`Current Goal` entry longer than ~10 lines that is already marked
+done/resolved. If either is true, say so plainly in your output and
+suggest the user run `handoff-compact` — do not attempt the collapse
+inline here.
 
 ## Writing Rules
 

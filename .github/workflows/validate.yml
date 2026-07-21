@@ -31,6 +31,7 @@ jobs:
           test -f tools/claude/skills/handoff-brief/SKILL.md
           test -f tools/claude/skills/handoff-update/SKILL.md
           test -f tools/claude/skills/handoff-close/SKILL.md
+          test -f tools/claude/skills/handoff-compact/SKILL.md
           test -f scripts/migrate-codex-to-ai-session.sh
           test -f templates/workspace/.ai-session/session-log/.gitkeep
           test -f templates/repo/.ai-session/session-log/.gitkeep

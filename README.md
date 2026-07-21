@@ -21,7 +21,10 @@ Reusable configuration and templates for agent-driven coding workflows.
 4. Use the global Claude Code handoff skills from `~/.claude/skills/`
    (`handoff-brief`, `handoff-update`, `handoff-close`) when you need to brief,
    update, or close a session. They are installed by `deploy-global.sh` and work
-   from any workspace root.
+   from any workspace root. Run `handoff-compact` on demand (or when
+   `handoff-update`/`handoff-close` flags `.ai-session/handoff.md` as
+   oversized) to collapse resolved entries into one-line pointers to
+   `.ai-session/tasks/`.
 
 ## Using Codex CLI
 

@@ -196,7 +196,8 @@ Typical installation targets (via symlinks):
 └── skills/
     ├── handoff-brief/            # Symlinked from tools/claude/skills/
     ├── handoff-update/
-    └── handoff-close/
+    ├── handoff-close/
+    └── handoff-compact/         # On-demand handoff.md compaction (Claude only)
 
 <workspace-root>/
 └── CLAUDE.md                      # Symlinked from tools/claude/workspace/CLAUDE.md
