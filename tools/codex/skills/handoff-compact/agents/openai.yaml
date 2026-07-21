@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff Compact"
+  short_description: "Compact a bloated workspace handoff."
+  default_prompt: "Use $handoff-compact to identify and safely compact resolved workspace handoff entries."

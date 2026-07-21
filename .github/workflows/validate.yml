@@ -28,6 +28,7 @@ jobs:
           test -f tools/codex/skills/handoff-brief/SKILL.md
           test -f tools/codex/skills/handoff-update/SKILL.md
           test -f tools/codex/skills/handoff-close/SKILL.md
+          test -f tools/codex/skills/handoff-compact/SKILL.md
           test -f tools/claude/skills/handoff-brief/SKILL.md
           test -f tools/claude/skills/handoff-update/SKILL.md
           test -f tools/claude/skills/handoff-close/SKILL.md

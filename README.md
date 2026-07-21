@@ -33,7 +33,11 @@ Reusable configuration and templates for agent-driven coding workflows.
    - `bash scripts/deploy-workspace.sh <workspace-root>`
 2. Start Codex in the workspace root.
 3. Use the global Codex handoff skills from `~/.codex/skills/` when you need
-   to brief, update, or close a session.
+   to brief, update, or close a session (`handoff-brief`, `handoff-update`,
+   `handoff-close`). Run `handoff-compact` on demand (or when
+   `handoff-update`/`handoff-close` flags `.ai-session/handoff.md` as
+   oversized) to collapse resolved entries into one-line pointers to
+   `.ai-session/tasks/`.
 4. If you are moving from legacy `.codex` handoff files, run:
    - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>`
 

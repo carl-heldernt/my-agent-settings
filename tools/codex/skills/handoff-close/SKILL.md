@@ -34,6 +34,8 @@ Use the `.ai-session/` directory at that level for all handoff state.
    unfinished detailed TODO items.
 7. Refresh `.ai-session/handoff.md`.
 8. Append a concise closeout entry to `.ai-session/session-log/YYYY-MM-DD.md`.
+9. Check `.ai-session/handoff.md` size (see Compaction Check below) and
+   report the suggestion to the user if it triggers.
 
 ## Required Content
 
@@ -57,6 +59,18 @@ Ensure the handoff covers:
 - Keep `.ai-session/handoff.md` concise and move
   detailed unfinished task context into `.ai-session/tasks/`
   when needed.
+
+## Compaction Check
+
+This skill does not compact `.ai-session/handoff.md` itself — that judgment
+call belongs to the `handoff-compact` skill, run separately.
+
+After refreshing the handoff, check whether it has grown past the point
+where skimming still works: more than ~150 lines total, or any single
+`Current Goal` entry longer than ~10 lines that is already marked
+done/resolved. If either is true, say so plainly in your closeout report
+and suggest the user run `handoff-compact` — do not attempt the collapse
+inline here.
 
 ## Writing Rules
 
