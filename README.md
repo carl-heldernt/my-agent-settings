@@ -41,6 +41,21 @@ Reusable configuration and templates for agent-driven coding workflows.
 4. If you are moving from legacy `.codex` handoff files, run:
    - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>`
 
+## Codex Commit Validation Hook
+
+`deploy-global.sh` also installs a Codex `PreToolUse` hook that validates
+Codex-initiated `git commit` commands before Git runs. Every commit must use
+explicit `-m` arguments for both the subject and body. The required body
+bullets scale by commit type and staged change size: `docs`/`chore` changes
+start with a `why`, while `feat`/`fix` changes require `what` and `why`; larger
+changes additionally require impact, tests, or verification details. Opaque
+message sources such as `-F` or editor-based commits are rejected.
+
+After the first installation, start Codex and use `/hooks` to review and trust
+the hook. Codex skips changed non-managed hooks until they are trusted again.
+The hook only governs Bash commands issued by Codex; it does not replace a Git
+`commit-msg` hook for manual or other-agent commits.
+
 ## Using Copilot CLI
 
 1. Deploy the workspace settings:

@@ -1,0 +1,18 @@
+{
+  "description": "Block Codex git commits that do not satisfy the shared commit-message policy.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/hooks/validate_git_commit.py",
+            "statusMessage": "Validating git commit message",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

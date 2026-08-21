@@ -173,7 +173,9 @@ Used for:
 Typical installation targets (via Symlinks):
 ```text
 ~/.codex/
-└── AGENTS.md                      # Symlinked from tools/codex/global/AGENTS.md
+├── AGENTS.md                      # Symlinked from tools/codex/global/AGENTS.md
+├── hooks.json                     # Symlinked Codex lifecycle hook configuration
+├── hooks/                         # Symlinked Codex hook scripts
 └── skills/
     ├── handoff-brief/            # Symlinked from tools/codex/skills/
     ├── handoff-update/
@@ -295,6 +297,7 @@ $ python scripts/build.py --validate
 
 ### `deploy-global.sh` (Global Setup Manager)
 Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`, `~/.claude/`) and establishes symbolic links targeting compiled global rules and the shared handoff skills for both Codex (`~/.codex/skills/`) and Claude Code (`~/.claude/skills/`).
+It also deploys Codex's global `PreToolUse` commit-message validation hook.
 
 ### `deploy-workspace.sh` (Workspace Deployment Manager)
 Initializes a target workspace root directory (e.g., `~/workspace/GitLab/`).

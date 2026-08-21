@@ -23,6 +23,8 @@ python3 "$ROOT_DIR/scripts/build.py"
 mkdir -p "$HOME/.codex"
 mkdir -p "$HOME/.codex/skills"
 safe_link "$ROOT_DIR/tools/codex/global/AGENTS.md" "$HOME/.codex/AGENTS.md"
+safe_link "$ROOT_DIR/tools/codex/global/hooks.json" "$HOME/.codex/hooks.json"
+safe_link "$ROOT_DIR/tools/codex/global/hooks" "$HOME/.codex/hooks"
 for skill_dir in "$ROOT_DIR"/tools/codex/skills/*; do
   [[ -d "$skill_dir" ]] || continue
   safe_link "$skill_dir" "$HOME/.codex/skills/$(basename "$skill_dir")"
