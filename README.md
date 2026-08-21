@@ -48,7 +48,9 @@ Codex-initiated `git commit` commands before Git runs. Every commit must use
 explicit `-m` arguments for both the subject and body. The required body
 bullets scale by commit type and staged change size: `docs`/`chore` changes
 start with a `why`, while `feat`/`fix` changes require `what` and `why`; larger
-changes additionally require impact, tests, or verification details. Opaque
+changes additionally require impact, tests, or verification details. Use one
+body `-m` argument containing newline-separated bullets without blank lines.
+Opaque
 message sources such as `-F` or editor-based commits are rejected.
 
 After the first installation, start Codex and use `/hooks` to review and trust

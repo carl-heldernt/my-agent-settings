@@ -27,8 +27,8 @@ class ValidateGitCommitTests(unittest.TestCase):
         stderr = io.StringIO()
         try:
             HOOK.sys.stdin = io.StringIO(json.dumps(payload))
-            if change_size is not None:
-                HOOK.get_change_size = lambda _cwd: change_size
+            effective_size = change_size or HOOK.ChangeSize(files=0, lines=0)
+            HOOK.get_change_size = lambda _cwd: effective_size
             with redirect_stderr(stderr):
                 try:
                     code = HOOK.main()
@@ -41,6 +41,11 @@ class ValidateGitCommitTests(unittest.TestCase):
 
     def test_allows_valid_subject_and_bullet_body(self) -> None:
         code, output = self.validate('git commit -m "feat(hooks): add commit validation" -m "- what: validate commit messages\n- why: prevent invalid repository history"')
+        self.assertEqual((code, output), (0, ""))
+
+    def test_allows_ansi_c_quoted_multiline_body(self) -> None:
+        command = "git commit -m \"feat(hooks): add commit validation\" -m $'- what: validate commit messages\\n- why: prevent invalid repository history'"
+        code, output = self.validate(command)
         self.assertEqual((code, output), (0, ""))
 
     def test_allows_breaking_change_footer(self) -> None:
@@ -86,6 +91,18 @@ class ValidateGitCommitTests(unittest.TestCase):
         code, output = self.validate('git commit -m "fix(hooks): reject empty body"')
         self.assertEqual(code, 2)
         self.assertIn("Every commit", output)
+
+    def test_rejects_multiple_body_arguments(self) -> None:
+        command = 'git commit -m "fix(hooks): require contiguous body" -m "- what: require one body argument" -m "- why: avoid blank list spacing"'
+        code, output = self.validate(command)
+        self.assertEqual(code, 2)
+        self.assertIn("exactly one -m subject", output)
+
+    def test_rejects_blank_body_lines(self) -> None:
+        command = 'git commit -m "fix(hooks): require contiguous body" -m "- what: require contiguous body bullets\n\n- why: avoid blank list spacing"'
+        code, output = self.validate(command)
+        self.assertEqual(code, 2)
+        self.assertIn("must not contain blank lines", output)
 
     def test_rejects_feat_body_without_what_and_why(self) -> None:
         code, output = self.validate('git commit -m "feat(hooks): add body validation" -m "- why: enforce useful commit context"')

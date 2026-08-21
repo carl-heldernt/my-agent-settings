@@ -11,6 +11,8 @@
 - Do not end the subject line with a period.
 - Do not include AI signatures or tool-specific metadata.
 - Every commit must include a body using `- <label>: <detail>` bullets.
+- Pass the body as exactly one additional `-m` argument with newline-separated
+  bullets; do not include blank lines between bullets.
 - Select required body labels from the commit type and change size:
   - `docs` and `chore`: small changes require `why`; medium changes require
     `what` and `why`; large changes also require `verification`.

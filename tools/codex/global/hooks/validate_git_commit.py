@@ -29,6 +29,7 @@ NON_IMPERATIVE_STARTS = {
 GIT_OPTIONS_WITH_VALUES = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix"}
 UNSUPPORTED_MESSAGE_OPTIONS = {"-F", "--file", "--reuse-message", "-C", "--reedit-message", "-c", "--fixup", "--squash"}
 BODY_BULLET_PATTERN = re.compile(r"^- (?P<label>[a-z-]+): (?P<detail>.+)$")
+ANSI_C_QUOTED_PATTERN = re.compile(r"\$'((?:\\.|[^'])*)'", re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -56,10 +57,27 @@ def block(reason: str) -> None:
     raise SystemExit(2)
 
 
+def decode_ansi_c_quoted(match: re.Match[str]) -> str:
+    """Convert the Bash ANSI-C quote subset used for multiline -m values."""
+    escapes = {"n": "\n", "r": "\r", "t": "\t", "\\": "\\", "'": "'", '"': '"'}
+    content = match.group(1)
+    decoded: list[str] = []
+    index = 0
+    while index < len(content):
+        character = content[index]
+        if character == "\\" and index + 1 < len(content):
+            index += 1
+            decoded.append(escapes.get(content[index], content[index]))
+        else:
+            decoded.append(character)
+        index += 1
+    return shlex.quote("".join(decoded))
+
+
 def split_shell_command(command: str) -> list[list[str]]:
     """Split simple shell pipelines into token lists without executing them."""
     try:
-        tokens = shlex.split(command, posix=True)
+        tokens = shlex.split(ANSI_C_QUOTED_PATTERN.sub(decode_ansi_c_quoted, command), posix=True)
     except ValueError:
         block("Commit command must use valid shell quoting and explicit -m arguments.")
 
@@ -198,13 +216,17 @@ def get_change_size(cwd: str) -> ChangeSize:
 
 
 def validate_body(messages: Sequence[str], subject: CommitSubject, change_size: ChangeSize) -> None:
-    body = "\n\n".join(messages[1:])
+    if len(messages) != 2:
+        block("Every commit must use exactly one -m subject and one -m body; separate body bullets with newlines, not additional -m arguments.")
+    body = messages[1]
     if AI_METADATA_PATTERN.search("\n".join(messages)):
         block("Commit message must not include AI signatures or tool-specific metadata.")
     if not body:
         block("Every commit must include a body in an additional -m argument.")
 
     lines = body.splitlines()
+    if any(not line for line in lines):
+        block("Commit body must not contain blank lines; keep labeled bullets consecutive.")
     if any(len(line) > 72 for line in lines):
         block("Commit body lines must be 72 characters or fewer.")
     labels: set[str] = set()
