@@ -44,3 +44,5 @@ if [[ -d "$TEMPLATE_DIR/tasks" ]]; then
 fi
 safe_link "$ROOT_DIR/tools/copilot" "$WORKSPACE_ROOT/.github"
 safe_link "$ROOT_DIR/tools/claude/workspace/CLAUDE.md" "$WORKSPACE_ROOT/CLAUDE.md"
+safe_link "$ROOT_DIR/tools/antigravity/workspace/GEMINI.md" "$WORKSPACE_ROOT/GEMINI.md"
+

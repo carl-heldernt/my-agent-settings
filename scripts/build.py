@@ -36,12 +36,14 @@ def load_markdown_files(paths: list[Path]) -> list[tuple[str, str]]:
     return sections
 
 
-# Rules that apply to every project on the machine (loaded via ~/.claude/CLAUDE.md).
+# Rules that apply to every project on the machine (loaded via ~/.claude/CLAUDE.md and ~/.gemini/antigravity-cli/GEMINI.md).
 CLAUDE_GLOBAL_RULES = ["git-commit.md", "language.md", "security.md"]
+ANTIGRAVITY_GLOBAL_RULES = ["git-commit.md", "language.md", "security.md"]
 
-# Rules that apply only at a workspace root (loaded via <workspace>/CLAUDE.md).
+# Rules that apply only at a workspace root (loaded via <workspace>/CLAUDE.md and <workspace>/GEMINI.md).
 # session-handoff is intentionally excluded: it is covered by the handoff skills.
 CLAUDE_WORKSPACE_RULES = ["workspace-context.md"]
+ANTIGRAVITY_WORKSPACE_RULES = ["workspace-context.md"]
 
 
 def load_shared_rules() -> list[tuple[str, str]]:
@@ -117,6 +119,8 @@ def build(validate_only: bool) -> int:
     claude_instructions = load_claude_instructions()
     claude_global_rules = load_rules_by_names(CLAUDE_GLOBAL_RULES)
     claude_workspace_rules = load_rules_by_names(CLAUDE_WORKSPACE_RULES)
+    antigravity_global_rules = load_rules_by_names(ANTIGRAVITY_GLOBAL_RULES)
+    antigravity_workspace_rules = load_rules_by_names(ANTIGRAVITY_WORKSPACE_RULES)
 
     # Codex and Copilot include all shared rules + workflows (no skills equivalent).
     codex_sections = shared_rules + shared_workflows
@@ -125,6 +129,10 @@ def build(validate_only: bool) -> int:
     claude_global_sections = claude_global_rules + claude_instructions
     # Claude workspace: workspace-scoped rules only; loaded when CWD is a workspace root.
     claude_workspace_sections = claude_workspace_rules
+    # Antigravity global: personal rules only; session-handoff covered by skills.
+    antigravity_global_sections = antigravity_global_rules
+    # Antigravity workspace: workspace-scoped rules only; loaded when CWD is a workspace root.
+    antigravity_workspace_sections = antigravity_workspace_rules
 
     rendered = {
         ROOT / "tools" / "codex" / "global" / "AGENTS.md": render_document(
@@ -146,6 +154,16 @@ def build(validate_only: bool) -> int:
             "Claude Code Workspace Instructions",
             version,
             claude_workspace_sections,
+        ),
+        ROOT / "tools" / "antigravity" / "global" / "GEMINI.md": render_document(
+            "Antigravity Instructions",
+            version,
+            antigravity_global_sections,
+        ),
+        ROOT / "tools" / "antigravity" / "workspace" / "GEMINI.md": render_document(
+            "Antigravity Workspace Instructions",
+            version,
+            antigravity_workspace_sections,
         ),
     }
 
@@ -169,6 +187,16 @@ def build(validate_only: bool) -> int:
             ROOT / "tools" / "claude" / "workspace" / "CLAUDE.md",
             rendered[ROOT / "tools" / "claude" / "workspace" / "CLAUDE.md"],
             [title for title, _ in claude_workspace_sections],
+        )
+        validate_rendered_document(
+            ROOT / "tools" / "antigravity" / "global" / "GEMINI.md",
+            rendered[ROOT / "tools" / "antigravity" / "global" / "GEMINI.md"],
+            [title for title, _ in antigravity_global_sections],
+        )
+        validate_rendered_document(
+            ROOT / "tools" / "antigravity" / "workspace" / "GEMINI.md",
+            rendered[ROOT / "tools" / "antigravity" / "workspace" / "GEMINI.md"],
+            [title for title, _ in antigravity_workspace_sections],
         )
         return 0
 

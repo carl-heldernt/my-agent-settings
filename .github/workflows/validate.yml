@@ -33,9 +33,21 @@ jobs:
           test -f tools/claude/skills/handoff-update/SKILL.md
           test -f tools/claude/skills/handoff-close/SKILL.md
           test -f tools/claude/skills/handoff-compact/SKILL.md
+          test -f tools/antigravity/global/GEMINI.md
+          test -f tools/antigravity/global/hooks.json
+          test -f tools/antigravity/global/hooks/validate_git_commit.py
+          test -f tools/antigravity/workspace/GEMINI.md
+          test -f tools/antigravity/skills/handoff-brief/SKILL.md
+          test -f tools/antigravity/skills/handoff-update/SKILL.md
+          test -f tools/antigravity/skills/handoff-close/SKILL.md
+          test -f tools/antigravity/skills/handoff-compact/SKILL.md
           test -f scripts/migrate-codex-to-ai-session.sh
           test -f templates/workspace/.ai-session/session-log/.gitkeep
           test -f templates/repo/.ai-session/session-log/.gitkeep
 
       - name: Run build validation
         run: python3 scripts/build.py --validate
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -v
+

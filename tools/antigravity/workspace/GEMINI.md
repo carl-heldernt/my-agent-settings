@@ -1,6 +1,6 @@
 <!-- Generated from my-agent-settings v0.3.0 | 2026-08-31 -->
 
-# Claude Code Workspace Instructions
+# Antigravity Workspace Instructions
 
 ## Workspace Context Rules
 

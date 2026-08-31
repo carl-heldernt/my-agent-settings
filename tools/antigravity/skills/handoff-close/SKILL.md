@@ -1,0 +1,81 @@
+---
+name: handoff-close
+description: Close out a work session in a multi-repo development workspace. Use when you need to summarize completed work, summarize unfinished work, record blockers or risks, propose next actions, and refresh `.ai-session/handoff.md` before ending major work or handing off to a future session.
+---
+
+# Handoff Close
+
+## Overview
+
+Capture the end-of-session engineering state before context is lost.
+Refresh the durable handoff so the next session can resume quickly.
+
+The active handoff scope is the platform-level workspace root (e.g., `~/workspace/GitLab/` or `~/workspace/GitHub/`).
+Use the `.ai-session/` directory at that level for all handoff state.
+
+## Closeout Workflow
+
+1. Review `GEMINI.md` (or `AGENTS.md`), `.ai-session/handoff.md`,
+   and the current workspace state.
+2. Review relevant files in `.ai-session/tasks/*.md` for unfinished or active TODO items when they exist.
+3. Treat `frontmatter.status` as authoritative for task files and keep status prefixes aligned when you update them.
+4. Inspect each relevant repo for:
+   - branch and cleanliness
+   - modified or untracked files
+   - recent commits in the active workstream
+5. Summarize:
+   - completed work
+   - unfinished work
+   - blockers, risks, and unresolved decisions
+   - recommended next actions
+6. Refresh `.ai-session/tasks/*.md` for any unfinished detailed TODO items.
+7. Refresh `.ai-session/handoff.md`.
+8. Append a concise closeout entry to `.ai-session/session-log/YYYY-MM-DD.md`.
+9. Check `.ai-session/handoff.md` size (see Compaction Check below) and
+   report the suggestion to the user if it triggers.
+
+## Required Content
+
+Ensure the handoff covers:
+
+1. `Current Goal`
+2. `Current Status`
+3. `Important Decisions`
+4. `Relevant Repos / Files`
+5. `Commands Already Run`
+6. `Known Issues`
+7. `Next Suggested Steps`
+
+## Closeout Emphasis
+
+- Distinguish clearly between finished and unfinished work.
+- Record blockers and risks that could cause the next session to stall.
+- Mention any validation that was completed and any validation still missing.
+- Highlight dirty repos that must not be forgotten.
+- Use only `draft`, `in-progress`, and `done` as task states.
+- Keep `.ai-session/handoff.md` concise and move detailed unfinished task context into `.ai-session/tasks/` when needed.
+
+## Compaction Check
+
+This skill does not compact `.ai-session/handoff.md` itself — that judgment
+call belongs to the `handoff-compact` skill, run separately.
+
+After refreshing the handoff, check whether it has grown past the point
+where skimming still works: more than ~150 lines total, or any single
+`Current Goal` entry longer than ~10 lines that is already marked
+done/resolved. If either is true, say so plainly in your closeout report
+and suggest the user run `handoff-compact` — do not attempt the collapse
+inline here.
+
+## Writing Rules
+
+- Keep the summary concise and factual.
+- Prefer durable engineering context over conversational detail.
+- Name exact repos, files, branches, and commands when they matter.
+- Use plain language that helps the next session decide what to do first.
+
+## Safety Rules
+
+- Never copy raw Antigravity session data into the workspace.
+- Do not store secrets, customer data, or environment values in handoff notes.
+- Do not claim work is complete if repo state or tests do not support it.

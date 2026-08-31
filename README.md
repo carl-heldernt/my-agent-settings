@@ -58,6 +58,28 @@ the hook. Codex skips changed non-managed hooks until they are trusted again.
 The hook only governs Bash commands issued by Codex; it does not replace a Git
 `commit-msg` hook for manual or other-agent commits.
 
+## Using Antigravity CLI (`agy`)
+
+1. Deploy the global settings:
+   - `bash scripts/deploy-global.sh`
+2. Start `agy` in any directory. Global instructions are loaded from
+   `~/.gemini/antigravity-cli/GEMINI.md` automatically.
+3. To also apply instructions at a workspace root level, run:
+   - `bash scripts/deploy-workspace.sh <workspace-root>`
+   This creates a `GEMINI.md` symlink at the workspace root.
+4. Use the global Antigravity handoff skills from `~/.gemini/antigravity-cli/skills/`
+   (`handoff-brief`, `handoff-update`, `handoff-close`, `handoff-compact`) when you need to
+   brief, update, close, or compact a session. They are installed by `deploy-global.sh` and
+   work from any workspace root.
+
+## Antigravity Commit Validation Hook
+
+`deploy-global.sh` installs an Antigravity `PreToolUse` hook in
+`~/.gemini/antigravity-cli/hooks.json` that validates agent-initiated `git commit` commands
+before `run_command` executes. Every commit must follow the shared 50/72 commit-message
+policy and include required body bullets. Non-compliant commits are rejected with a descriptive
+reason.
+
 ## Using Copilot CLI
 
 1. Deploy the workspace settings:
@@ -70,7 +92,7 @@ The hook only governs Bash commands issued by Codex; it does not replace a Git
 
 - `python3 scripts/build.py` to generate compiled tool outputs
 - `python3 scripts/build.py --validate` to validate inputs only
-- `bash scripts/deploy-global.sh` to install global Codex and Claude Code config
+- `bash scripts/deploy-global.sh` to install global Codex, Claude Code, and Antigravity config
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
 
@@ -79,8 +101,9 @@ The hook only governs Bash commands issued by Codex; it does not replace a Git
 - Run `python3 scripts/build.py` whenever you change shared rules, shared workflows, or Copilot instruction sources that feed generated outputs under `tools/*/global/`.
 - Run `python3 scripts/build.py --validate` when you want a quick consistency check without rewriting generated files.
 - Do not run deployment or migration scripts for documentation-only changes unless you are intentionally applying the updated templates or configuration to a real workspace.
-- Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates, Copilot workspace files, or the workspace-level `CLAUDE.md` symlink.
-- Run `bash scripts/deploy-global.sh` only when you need to refresh the installed global Codex and Claude Code configuration.
+- Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates, Copilot workspace files, or the workspace-level `CLAUDE.md`/`GEMINI.md` symlinks.
+- Run `bash scripts/deploy-global.sh` only when you need to refresh the installed global Codex, Claude Code, and Antigravity configuration.
+
 - Run `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` only when moving an existing workspace from legacy `.codex` handoff state.
 
 ## Task file status model

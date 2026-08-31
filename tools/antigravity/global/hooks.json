@@ -1,0 +1,16 @@
+{
+  "git-commit-validator": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.gemini/antigravity-cli/hooks/validate_git_commit.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

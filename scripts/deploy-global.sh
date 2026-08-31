@@ -37,3 +37,15 @@ for skill_dir in "$ROOT_DIR"/tools/claude/skills/*; do
   [[ -d "$skill_dir" ]] || continue
   safe_link "$skill_dir" "$HOME/.claude/skills/$(basename "$skill_dir")"
 done
+
+mkdir -p "$HOME/.gemini/antigravity-cli"
+mkdir -p "$HOME/.gemini/antigravity-cli/skills"
+mkdir -p "$HOME/.gemini/antigravity-cli/hooks"
+safe_link "$ROOT_DIR/tools/antigravity/global/GEMINI.md" "$HOME/.gemini/antigravity-cli/GEMINI.md"
+safe_link "$ROOT_DIR/tools/antigravity/global/hooks.json" "$HOME/.gemini/antigravity-cli/hooks.json"
+safe_link "$ROOT_DIR/tools/antigravity/global/hooks" "$HOME/.gemini/antigravity-cli/hooks"
+for skill_dir in "$ROOT_DIR"/tools/antigravity/skills/*; do
+  [[ -d "$skill_dir" ]] || continue
+  safe_link "$skill_dir" "$HOME/.gemini/antigravity-cli/skills/$(basename "$skill_dir")"
+done
+
