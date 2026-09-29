@@ -1,4 +1,4 @@
-<!-- Generated from my-agent-settings v0.3.0 | 2026-08-31 -->
+<!-- Generated from my-agent-settings v0.4.0 | 2026-09-29 -->
 
 # Copilot Instructions
 

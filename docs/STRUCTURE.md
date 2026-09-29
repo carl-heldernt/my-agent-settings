@@ -59,7 +59,10 @@ my-agent-settings/
 │   │
 │   ├── claude/
 │   │   ├── global/
-│   │   │   └── CLAUDE.md               # Compiled from shared/
+│   │   │   ├── CLAUDE.md               # Compiled from shared/
+│   │   │   ├── hooks.json              # Claude Code PreToolUse hook fragment (merged, not symlinked)
+│   │   │   └── hooks/
+│   │   │       └── validate_git_commit.py
 │   │   ├── workspace/
 │   │   │   └── CLAUDE.md               # Compiled from shared/ (workspace-scoped)
 │   │   ├── skills/
@@ -204,11 +207,16 @@ Claude Code specific configuration.
 Used for:
 - Claude Code global and workspace-level instructions
 - Claude Code global handoff skills
+- Claude Code lifecycle hook (`PreToolUse` git commit validation)
 
-Typical installation targets (via symlinks):
+Typical installation targets:
 ```text
 ~/.claude/
 ├── CLAUDE.md                      # Symlinked from tools/claude/global/CLAUDE.md
+├── hooks/                         # Symlinked from tools/claude/global/hooks/
+├── settings.json                  # NOT symlinked; hooks fragment merged in by
+│                                     scripts/merge_claude_hooks.py, preserving
+│                                     personal settings (theme, model, ...)
 └── skills/
     ├── handoff-brief/            # Symlinked from tools/claude/skills/
     ├── handoff-update/
@@ -222,6 +230,14 @@ Typical installation targets (via symlinks):
 Like Codex, Claude Code handoff skills are installed once into the global
 `~/.claude/skills/` location by `deploy-global.sh`, so they are available from
 every workspace root without per-workspace installation.
+
+Unlike `~/.codex/hooks.json` and `~/.gemini/antigravity-cli/hooks.json`,
+`~/.claude/settings.json` is a general-purpose personal settings file, not a
+repo-owned artifact, so `deploy-global.sh` cannot symlink it wholesale.
+Instead it symlinks `~/.claude/hooks/` and then runs
+`scripts/merge_claude_hooks.py`, which merges the shared `PreToolUse` commit
+hook from `tools/claude/global/hooks.json` into `~/.claude/settings.json`
+without disturbing unrelated keys or other configured hooks.
 
 
 ## tools/antigravity/
@@ -341,7 +357,7 @@ $ python scripts/build.py --validate
 
 ### `deploy-global.sh` (Global Setup Manager)
 Initializes user-level and machine-wide configuration files. It creates standard global config directories (e.g., `~/.codex/`, `~/.claude/`, `~/.gemini/antigravity-cli/`) and establishes symbolic links targeting compiled global rules and the shared handoff skills for Codex (`~/.codex/skills/`), Claude Code (`~/.claude/skills/`), and Antigravity (`~/.gemini/antigravity-cli/skills/`).
-It also deploys Codex's and Antigravity's global `PreToolUse` commit-message validation hooks.
+It also deploys Codex's, Claude Code's, and Antigravity's global `PreToolUse` commit-message validation hooks (merging Claude Code's into `~/.claude/settings.json` via `scripts/merge_claude_hooks.py` instead of symlinking, since that file also holds personal settings).
 
 ### `deploy-workspace.sh` (Workspace Deployment Manager)
 Initializes a target workspace root directory (e.g., `~/workspace/GitLab/`).

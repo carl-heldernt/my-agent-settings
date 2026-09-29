@@ -24,6 +24,9 @@ jobs:
           test -f tools/copilot/global/copilot-instructions.md
           test -f tools/copilot/instructions/handoff.instructions.md
           test -f tools/claude/global/CLAUDE.md
+          test -f tools/claude/global/hooks.json
+          test -f tools/claude/global/hooks/validate_git_commit.py
+          test -f scripts/merge_claude_hooks.py
           test -f tools/claude/workspace/CLAUDE.md
           test -f tools/codex/skills/handoff-brief/SKILL.md
           test -f tools/codex/skills/handoff-update/SKILL.md

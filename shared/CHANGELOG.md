@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0] - 2026-09-29
+### Added
+- Claude Code Git commit validation `PreToolUse` hook (`tools/claude/global/hooks.json` and `tools/claude/global/hooks/validate_git_commit.py`), mirroring the Codex and Antigravity hooks.
+- `scripts/merge_claude_hooks.py` to merge the shared hook fragment into `~/.claude/settings.json` without disturbing personal settings or other hooks, since that file cannot be symlinked wholesale like `~/.codex/hooks.json`.
+- `deploy-global.sh` support for symlinking `~/.claude/hooks/` and running the settings merge.
+- Unit tests for the Claude Code commit validation hook (`tests/test_validate_git_commit_claude.py`) and the settings merge (`tests/test_merge_claude_hooks.py`).
+- CI validation checks for the new Claude Code hook files.
+
 ## [0.3.0] - 2026-08-31
 ### Added
 - Antigravity CLI (`agy`) support: `tools/antigravity/global/GEMINI.md` and `tools/antigravity/workspace/GEMINI.md` compiled from shared rules.

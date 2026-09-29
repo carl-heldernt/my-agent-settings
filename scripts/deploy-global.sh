@@ -33,10 +33,15 @@ done
 mkdir -p "$HOME/.claude"
 mkdir -p "$HOME/.claude/skills"
 safe_link "$ROOT_DIR/tools/claude/global/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+safe_link "$ROOT_DIR/tools/claude/global/hooks" "$HOME/.claude/hooks"
 for skill_dir in "$ROOT_DIR"/tools/claude/skills/*; do
   [[ -d "$skill_dir" ]] || continue
   safe_link "$skill_dir" "$HOME/.claude/skills/$(basename "$skill_dir")"
 done
+# ~/.claude/settings.json holds personal, non-repo settings too, so it cannot
+# be symlinked outright like hooks.json is for Codex and Antigravity; merge
+# just the shared PreToolUse commit-validation hook into it instead.
+python3 "$ROOT_DIR/scripts/merge_claude_hooks.py"
 
 mkdir -p "$HOME/.gemini/antigravity-cli"
 mkdir -p "$HOME/.gemini/antigravity-cli/skills"

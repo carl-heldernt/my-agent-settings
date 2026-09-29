@@ -26,6 +26,20 @@ Reusable configuration and templates for agent-driven coding workflows.
    oversized) to collapse resolved entries into one-line pointers to
    `.ai-session/tasks/`.
 
+## Claude Code Commit Validation Hook
+
+`deploy-global.sh` also merges a `PreToolUse` hook into `~/.claude/settings.json`
+that validates Claude Code-initiated `git commit` commands before Git runs,
+mirroring the Codex and Antigravity hooks. Every commit must use explicit `-m`
+arguments for both the subject and body, and the required body bullets scale
+by commit type and staged change size the same way as the other tools. Because
+`~/.claude/settings.json` also holds personal, non-repo settings (theme,
+status line, model, ...), `deploy-global.sh` cannot symlink it outright;
+instead `scripts/merge_claude_hooks.py` merges just the shared hook fragment
+from `tools/claude/global/hooks.json` into it, leaving every other key and
+hook untouched. Re-run `bash scripts/deploy-global.sh` after any policy update
+to refresh the merged hook. Use `/hooks` in Claude Code to review it.
+
 ## Using Codex CLI
 
 1. Deploy the workspace and global settings if needed:
@@ -92,7 +106,7 @@ reason.
 
 - `python3 scripts/build.py` to generate compiled tool outputs
 - `python3 scripts/build.py --validate` to validate inputs only
-- `bash scripts/deploy-global.sh` to install global Codex, Claude Code, and Antigravity config
+- `bash scripts/deploy-global.sh` to install global Codex, Claude Code, and Antigravity config (including the Claude Code commit-validation hook merge)
 - `bash scripts/deploy-workspace.sh <workspace-root>` to initialize a workspace root
 - `bash scripts/migrate-codex-to-ai-session.sh <workspace-root>` to move legacy `.codex` handoff data into `.ai-session`
 
