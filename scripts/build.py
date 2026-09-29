@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 from datetime import date
 from pathlib import Path
 import sys
@@ -16,6 +17,15 @@ WORKFLOWS_DIR = SHARED_DIR / "workflows"
 VERSION_FILE = SHARED_DIR / "VERSION"
 COPILOT_INSTRUCTIONS_DIR = ROOT / "tools" / "copilot" / "instructions"
 CLAUDE_INSTRUCTIONS_DIR = ROOT / "tools" / "claude" / "instructions"
+HOOKS_CORE_FILE = SHARED_DIR / "hooks" / "validate_git_commit_core.py"
+
+# Tool label used in the generated hook's docstring, and the deployed path
+# each tool's hooks_adapter.py is compiled into.
+HOOK_TOOLS = {
+    "codex": ("Codex", ROOT / "tools" / "codex" / "global" / "hooks" / "validate_git_commit.py"),
+    "claude": ("Claude Code", ROOT / "tools" / "claude" / "global" / "hooks" / "validate_git_commit.py"),
+    "antigravity": ("Antigravity", ROOT / "tools" / "antigravity" / "global" / "hooks" / "validate_git_commit.py"),
+}
 
 
 def read_text(path: Path) -> str:
@@ -97,6 +107,38 @@ def render_document(title: str, version: str, sections: list[tuple[str, str]]) -
     return "\n".join(parts).rstrip() + "\n"
 
 
+def render_hook_script(tool: str, version: str) -> str:
+    """Concatenate the shared validation core with a tool's I/O adapter."""
+    label, output_path = HOOK_TOOLS[tool]
+    adapter_path = output_path.parents[1] / "hooks_adapter.py"
+    core_text = read_text(HOOKS_CORE_FILE)
+    adapter_text = read_text(adapter_path)
+
+    core_body = re.sub(r'^""".*?"""\n', "", core_text, count=1, flags=re.DOTALL).strip("\n")
+    core_body = core_body.replace(
+        "import re\nimport shlex\nimport subprocess\nfrom collections.abc import Sequence\n",
+        "import json\nimport re\nimport shlex\nimport subprocess\nimport sys\nfrom collections.abc import Sequence\n",
+        1,
+    )
+
+    header = f"# Generated from my-agent-settings v{version} | {date.today().isoformat()} — do not edit directly."
+    source_note = f"# Source: shared/hooks/validate_git_commit_core.py + tools/{tool}/global/hooks_adapter.py"
+    docstring = f'"""Reject {label} git commits that violate the shared commit-message policy."""'
+
+    parts = [
+        "#!/usr/bin/env python3",
+        docstring,
+        header,
+        source_note,
+        "",
+        core_body,
+        "",
+        "",
+        adapter_text.strip("\n"),
+    ]
+    return "\n".join(parts) + "\n"
+
+
 def validate_rendered_document(path: Path, content: str, section_titles: list[str]) -> None:
     if not content.strip():
         raise ValueError(f"Rendered output is empty: {path}")
@@ -109,6 +151,17 @@ def validate_rendered_document(path: Path, content: str, section_titles: list[st
         if index == -1:
             raise ValueError(f"Missing section {section_title} in {path}")
         search_from = index + len(marker)
+
+
+def validate_hook_script(path: Path, content: str) -> None:
+    if not content.startswith("#!/usr/bin/env python3\n"):
+        raise ValueError(f"Missing shebang: {path}")
+    if "# Generated from my-agent-settings v" not in content:
+        raise ValueError(f"Missing generated header: {path}")
+    for required in ("def validate_body(", "def main(", 'if __name__ == "__main__":'):
+        if required not in content:
+            raise ValueError(f"Missing {required!r} in {path}")
+    compile(content, str(path), "exec")
 
 
 def build(validate_only: bool) -> int:
@@ -133,6 +186,8 @@ def build(validate_only: bool) -> int:
     antigravity_global_sections = antigravity_global_rules
     # Antigravity workspace: workspace-scoped rules only; loaded when CWD is a workspace root.
     antigravity_workspace_sections = antigravity_workspace_rules
+
+    hook_scripts = {output_path: render_hook_script(tool, version) for tool, (_, output_path) in HOOK_TOOLS.items()}
 
     rendered = {
         ROOT / "tools" / "codex" / "global" / "AGENTS.md": render_document(
@@ -198,9 +253,15 @@ def build(validate_only: bool) -> int:
             rendered[ROOT / "tools" / "antigravity" / "workspace" / "GEMINI.md"],
             [title for title, _ in antigravity_workspace_sections],
         )
+        for tool, (_, output_path) in HOOK_TOOLS.items():
+            validate_hook_script(output_path, hook_scripts[output_path])
         return 0
 
     for path, content in rendered.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+
+    for path, content in hook_scripts.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
 

@@ -40,6 +40,18 @@ from `tools/claude/global/hooks.json` into it, leaving every other key and
 hook untouched. Re-run `bash scripts/deploy-global.sh` after any policy update
 to refresh the merged hook. Use `/hooks` in Claude Code to review it.
 
+## Shared Commit Validation Logic
+
+The Codex, Claude Code, and Antigravity commit-validation hooks all enforce
+the same policy but speak different stdin/stdout protocols. Rather than
+maintain three near-duplicate scripts, the policy itself lives once in
+`shared/hooks/validate_git_commit_core.py`; each tool supplies a small
+`tools/<tool>/global/hooks_adapter.py` with just its protocol glue, and
+`python3 scripts/build.py` compiles core + adapter into each deployed
+`tools/<tool>/global/hooks/validate_git_commit.py`. Edit the policy in the
+core file, run `python3 scripts/build.py`, and all three tools pick up the
+change.
+
 ## Using Codex CLI
 
 1. Deploy the workspace and global settings if needed:
@@ -112,7 +124,7 @@ reason.
 
 ## When to run scripts
 
-- Run `python3 scripts/build.py` whenever you change shared rules, shared workflows, or Copilot instruction sources that feed generated outputs under `tools/*/global/`.
+- Run `python3 scripts/build.py` whenever you change shared rules, shared workflows, Copilot instruction sources, or the shared commit-validation hook (`shared/hooks/validate_git_commit_core.py`) or a tool's `hooks_adapter.py`, since all of these feed generated outputs under `tools/*/global/`.
 - Run `python3 scripts/build.py --validate` when you want a quick consistency check without rewriting generated files.
 - Do not run deployment or migration scripts for documentation-only changes unless you are intentionally applying the updated templates or configuration to a real workspace.
 - Run `bash scripts/deploy-workspace.sh <workspace-root>` only when you need to refresh a workspace with updated `.ai-session/` templates, Copilot workspace files, or the workspace-level `CLAUDE.md`/`GEMINI.md` symlinks.

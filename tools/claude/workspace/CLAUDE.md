@@ -1,4 +1,4 @@
-<!-- Generated from my-agent-settings v0.4.0 | 2026-09-29 -->
+<!-- Generated from my-agent-settings v0.5.0 | 2026-09-29 -->
 
 # Claude Code Workspace Instructions
 

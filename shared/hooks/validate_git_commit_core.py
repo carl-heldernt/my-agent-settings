@@ -1,15 +1,18 @@
-#!/usr/bin/env python3
-"""Reject Codex git commits that violate the shared commit-message policy."""
-# Generated from my-agent-settings v0.5.0 | 2026-09-29 — do not edit directly.
-# Source: shared/hooks/validate_git_commit_core.py + tools/codex/global/hooks_adapter.py
+"""Shared git commit message validation core (tool-neutral).
+
+This module holds the commit-message policy shared by every agent tool's
+`PreToolUse` hook. It has no stdin/stdout protocol of its own: each
+`tools/<tool>/global/hooks_adapter.py` supplies the tool-specific I/O (how the
+hook payload is shaped, and how a rejection is reported back) and calls into
+these functions. `scripts/build.py` concatenates this core with each
+adapter into the deployed `tools/<tool>/global/hooks/validate_git_commit.py`.
+"""
 
 from __future__ import annotations
 
-import json
 import re
 import shlex
 import subprocess
-import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -250,35 +253,3 @@ def validate_body(messages: Sequence[str], subject: CommitSubject, change_size: 
         block(f"{subject.commit_type} {change_size.tier} changes require body labels: {required}.")
     if subject.is_breaking and not BREAKING_CHANGE_PATTERN.search(body):
         block("Breaking changes require a BREAKING CHANGE: footer in the commit body.")
-
-
-# Codex PreToolUse adapter: stdin JSON tool_name/tool_input protocol,
-# rejects by printing to stderr and exiting 2.
-
-
-def main() -> int:
-    try:
-        payload = json.load(sys.stdin)
-    except json.JSONDecodeError:
-        return 0
-    if payload.get("tool_name") != "Bash":
-        return 0
-    command = payload.get("tool_input", {}).get("command")
-    if not isinstance(command, str):
-        return 0
-
-    try:
-        for tokens in split_shell_command(command):
-            arguments = find_git_commit_arguments(tokens)
-            if arguments is None:
-                continue
-            messages = extract_messages(arguments)
-            validate_body(messages, validate_subject(messages[0]), get_change_size(payload.get("cwd", ".")))
-    except ValidationError as err:
-        print(str(err), file=sys.stderr)
-        return 2
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

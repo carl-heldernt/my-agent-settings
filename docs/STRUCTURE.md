@@ -36,13 +36,19 @@ my-agent-settings/
 │   │   ├── git-commit.md
 │   │   ├── security.md
 │   │   └── workspace-context.md   # Rules for handling multi-repo environments
-│   └── workflows/
-│       └── session-handoff.md     # Standard operating procedure for handoffs
+│   ├── workflows/
+│   │   └── session-handoff.md     # Standard operating procedure for handoffs
+│   └── hooks/
+│       └── validate_git_commit_core.py  # Tool-neutral commit policy logic
 │
 ├── tools/
 │   ├── codex/
 │   │   ├── global/
-│   │   │   └── AGENTS.md          # Compiled from shared/
+│   │   │   ├── AGENTS.md          # Compiled from shared/
+│   │   │   ├── hooks.json         # Codex PreToolUse hook configuration
+│   │   │   ├── hooks_adapter.py   # Codex-specific stdin/stdout adapter (source)
+│   │   │   └── hooks/
+│   │   │       └── validate_git_commit.py  # Compiled: shared core + hooks_adapter.py
 │   │   ├── skills/
 │   │   │   └── <skill-name>/
 │   │   │       └── SKILL.md
@@ -61,8 +67,9 @@ my-agent-settings/
 │   │   ├── global/
 │   │   │   ├── CLAUDE.md               # Compiled from shared/
 │   │   │   ├── hooks.json              # Claude Code PreToolUse hook fragment (merged, not symlinked)
+│   │   │   ├── hooks_adapter.py        # Claude-specific stdin/stdout adapter (source)
 │   │   │   └── hooks/
-│   │   │       └── validate_git_commit.py
+│   │   │       └── validate_git_commit.py  # Compiled: shared core + hooks_adapter.py
 │   │   ├── workspace/
 │   │   │   └── CLAUDE.md               # Compiled from shared/ (workspace-scoped)
 │   │   ├── skills/
@@ -75,8 +82,9 @@ my-agent-settings/
 │       ├── global/
 │       │   ├── GEMINI.md               # Compiled from shared/
 │       │   ├── hooks.json              # Antigravity PreToolUse hook configuration
+│       │   ├── hooks_adapter.py        # Antigravity-specific toolCall/args adapter (source)
 │       │   └── hooks/
-│       │       └── validate_git_commit.py
+│       │       └── validate_git_commit.py  # Compiled: shared core + hooks_adapter.py
 │       ├── workspace/
 │       │   └── GEMINI.md               # Compiled from shared/ (workspace-scoped)
 │       └── skills/
@@ -121,6 +129,17 @@ Examples:
 Design rule:
 
 Create shared knowledge once, then use `scripts/build.py` to compile and map it into each agent's native format.
+
+The same DRY principle applies to executable hook logic, not just prose:
+`shared/hooks/validate_git_commit_core.py` holds the commit-message policy
+(subject/body rules, AI-metadata detection, change-size tiers) with no
+stdin/stdout protocol of its own. Each tool contributes a small
+`tools/<tool>/global/hooks_adapter.py` supplying its own protocol (Codex and
+Claude Code share the same `tool_name`/`tool_input` stdin JSON and exit-code-2
+blocking; Antigravity uses a different `toolCall`/`args` shape and a JSON
+`{"decision": ...}` response). `scripts/build.py` concatenates the core with
+each adapter into the deployed `tools/<tool>/global/hooks/validate_git_commit.py`,
+so the policy itself is edited in exactly one place.
 
 
 ### Versioning
@@ -333,6 +352,12 @@ Automation and synchronization helpers.
 
 ### `build.py` (Rule Compiler)
 Dynamically injects tool-neutral rules from `shared/rules/` into specific agent configuration templates (e.g., combining `git-commit.md` and `security.md` into Copilot's system instructions). This prevents duplication and ensures alignment across tools.
+
+It also compiles the commit-validation hooks: it concatenates
+`shared/hooks/validate_git_commit_core.py` with each tool's
+`tools/<tool>/global/hooks_adapter.py` into the deployed
+`tools/<tool>/global/hooks/validate_git_commit.py`, so the shared policy logic
+is written once and reused by Codex, Claude Code, and Antigravity.
 
 **Validation Mode (`--validate`)**:
 

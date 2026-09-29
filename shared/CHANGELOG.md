@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0] - 2026-09-29
+### Changed
+- Extracted the commit-message policy shared by all three hooks into `shared/hooks/validate_git_commit_core.py`, a tool-neutral module with no stdin/stdout protocol of its own.
+- Replaced each tool's standalone `validate_git_commit.py` with a small `tools/<tool>/global/hooks_adapter.py` supplying just that tool's protocol; `scripts/build.py` now compiles core + adapter into the deployed `tools/<tool>/global/hooks/validate_git_commit.py` for Codex, Claude Code, and Antigravity.
+- Unified the AI-metadata detection pattern across all three tools instead of each hook listing a different subset of tool names.
+### Added
+- CI validation checks for `shared/hooks/validate_git_commit_core.py` and each tool's `hooks_adapter.py`.
+
 ## [0.4.0] - 2026-09-29
 ### Added
 - Claude Code Git commit validation `PreToolUse` hook (`tools/claude/global/hooks.json` and `tools/claude/global/hooks/validate_git_commit.py`), mirroring the Codex and Antigravity hooks.
