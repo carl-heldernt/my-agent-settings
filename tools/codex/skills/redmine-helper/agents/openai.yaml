@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redmine Helper"
+  short_description: "Query, create, and update Redmine issues with approval."
+  default_prompt: "Use $redmine-helper to help with a Redmine issue, asking before each batch of Redmine requests."
