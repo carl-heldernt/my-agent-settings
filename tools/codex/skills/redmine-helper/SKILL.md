@@ -24,6 +24,18 @@ Use the configured Redmine MCP server for issue queries, creation, and updates. 
 5. For updates, read the current issue after approval, show the current and proposed values, then request write approval. Do not overwrite fields that the user did not ask to change.
 6. After an approved write, read the issue back and confirm the intended values. Report the issue ID and link, or the API error and any field that did not change. A successful HTTP response alone does not prove that a status transition took effect.
 
+## Issue text formatting
+
+The target Redmine server uses Markdown. Write every new issue description in Markdown, and use Markdown for any description or note created or modified through this skill. Follow the [official Redmine Markdown formatting guide](https://www.redmine.org/projects/redmine/wiki/RedmineTextFormattingMarkdown).
+
+- Use Markdown exclusively; do not use Textile syntax. Use `##` for main sections and `###` for subsections when needed. Keep heading levels consistent.
+- Use `**text**` for bold, `-` for unordered lists, and `1.` for ordered lists.
+- Use fenced code blocks with a language identifier for code, logs, and commands. Use standard Markdown tables when they improve readability.
+- Link to other Redmine issues with native references such as `#1234`. Avoid raw HTML because Redmine may restrict its rendering.
+- Preserve code fences, indentation, and line breaks in the content sent through the MCP server.
+
+Before creating or updating an issue, check any description or note being submitted for Textile syntax, heading consistency, valid code fences and tables, and supported Redmine issue references. Do not invent missing information to fill template sections. Do not reformat unrelated existing content when updating an issue.
+
 Use MCP only. If the configured Redmine MCP server is unavailable, explain the blocker; do not switch to a direct API request or seek credentials. Never place secrets in skill files or handoff records.
 
 ## Handoff use
