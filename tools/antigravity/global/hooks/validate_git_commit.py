@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reject Antigravity git commits that violate the shared commit-message policy."""
-# Generated from my-agent-settings v0.5.0 | 2026-09-29 — do not edit directly.
+# Generated from my-agent-settings v0.5.0 | 2026-10-30 — do not edit directly.
 # Source: shared/hooks/validate_git_commit_core.py + tools/antigravity/global/hooks_adapter.py
 
 from __future__ import annotations
